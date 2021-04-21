@@ -44,26 +44,31 @@ func handleInvalidRequest(w http.ResponseWriter, url string) {
 func calculateFib(resultForUser *result, n int) {
 	var wg sync.WaitGroup
 	wg.Add(4)
+
 	startI := time.Now()
 	go func() {
 		resultForUser.Iterative = fmt.Sprintf("%d It took me:%s", fib.IterativeFib(n), time.Since(startI))
 		wg.Done()
 	}()
+
 	startI2 := time.Now()
 	go func() {
 		resultForUser.IterativeFibV2 = fmt.Sprintf("%d It took me:%s", fib.IterativeFibV2(n), time.Since(startI2))
 		wg.Done()
 	}()
+
 	startR := time.Now()
 	go func() {
 		resultForUser.Recursive = fmt.Sprintf("%d It took me:%s", fib.RecursiveFib(n), time.Since(startR))
 		wg.Done()
 	}()
+
 	startS := time.Now()
 	go func() {
 		resultForUser.Slices = fmt.Sprintf("%d it took me: %s ", fib.SlicesFib(n), time.Since(startS))
 		wg.Done()
 	}()
+
 	wg.Wait()
 }
 
