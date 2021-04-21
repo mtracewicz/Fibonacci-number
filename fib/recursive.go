@@ -1,9 +1,17 @@
 package fib
 
-func RecursiveFib(n int) int {
+import "errors"
+
+func RecursiveFib(n int) (int, error) {
+	if n < 0 {
+		return 0, errors.New("must me positive integer")
+	}
+
 	if n == 0 || n == 1 {
-		return n
+		return n, nil
 	} else {
-		return RecursiveFib(n-1) + RecursiveFib(n-2)
+		f, _ := RecursiveFib(n - 1)
+		s, _ := RecursiveFib(n - 2)
+		return f + s, nil
 	}
 }

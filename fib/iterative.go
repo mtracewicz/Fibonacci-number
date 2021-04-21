@@ -1,6 +1,13 @@
 package fib
 
-func IterativeFib(n int) (fib int) {
+import "errors"
+
+func IterativeFib(n int) (int, error) {
+	var fib int
+	if n < 0 {
+		return 0, errors.New("must me positive integer")
+	}
+
 	x := 0
 	y := 1
 	z := 1
@@ -16,5 +23,5 @@ func IterativeFib(n int) (fib int) {
 	} else {
 		fib = z
 	}
-	return
+	return fib, nil
 }
