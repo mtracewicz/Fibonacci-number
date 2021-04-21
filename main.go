@@ -32,13 +32,11 @@ func fibonacci(w http.ResponseWriter, r *http.Request) {
 	}
 
 	calculateFib(&resultForUser, n)
+	if !isResultValid(resultForUser) {
+		handleInvalidRequest(w, r.URL.String())
+		return
+	}
 	respond(w, &resultForUser)
-}
-
-func handleInvalidRequest(w http.ResponseWriter, url string) {
-	w.WriteHeader((http.StatusBadRequest))
-	io.WriteString(w, "Must be a positive integer!")
-	log.Printf("Invalid request URL: %s!", url)
 }
 
 func calculateFib(resultForUser *result, n int) {
@@ -47,29 +45,52 @@ func calculateFib(resultForUser *result, n int) {
 
 	startI := time.Now()
 	go func() {
-		resultForUser.Iterative = fmt.Sprintf("%d It took me:%s", fib.IterativeFib(n), time.Since(startI))
-		wg.Done()
+		defer completeCalculation(&wg)
+		res, err := fib.IterativeFib(n)
+		if err != nil {
+			panic("Error: Must be a positive integer!")
+		}
+		resultForUser.Iterative = fmt.Sprintf("%d It took me:%s", res, time.Since(startI))
 	}()
 
 	startI2 := time.Now()
 	go func() {
-		resultForUser.IterativeFibV2 = fmt.Sprintf("%d It took me:%s", fib.IterativeFibV2(n), time.Since(startI2))
-		wg.Done()
+		defer completeCalculation(&wg)
+		res, err := fib.IterativeFibV2(n)
+		if err != nil {
+			panic("Error: Must be a positive integer!")
+		}
+		resultForUser.IterativeFibV2 = fmt.Sprintf("%d It took me:%s", res, time.Since(startI2))
 	}()
 
 	startR := time.Now()
 	go func() {
-		resultForUser.Recursive = fmt.Sprintf("%d It took me:%s", fib.RecursiveFib(n), time.Since(startR))
-		wg.Done()
+		defer completeCalculation(&wg)
+		res, err := fib.RecursiveFib(n)
+		if err != nil {
+			panic("Error: Must be a positive integer!")
+		}
+		resultForUser.Recursive = fmt.Sprintf("%d It took me:%s", res, time.Since(startR))
 	}()
 
 	startS := time.Now()
 	go func() {
-		resultForUser.Slices = fmt.Sprintf("%d it took me: %s ", fib.SlicesFib(n), time.Since(startS))
-		wg.Done()
+		defer completeCalculation(&wg)
+		res, err := fib.SlicesFib(n)
+		if err != nil {
+			panic("Error: Must be a positive integer!")
+		}
+		resultForUser.Slices = fmt.Sprintf("%d it took me: %s ", res, time.Since(startS))
 	}()
 
 	wg.Wait()
+}
+
+func completeCalculation(wg *sync.WaitGroup) {
+	wg.Done()
+	if r := recover(); r != nil {
+		fmt.Println("Recovered from ", r)
+	}
 }
 
 func respond(w http.ResponseWriter, resultForUser *result) {
@@ -78,4 +99,14 @@ func respond(w http.ResponseWriter, resultForUser *result) {
 	marshaled, _ := json.Marshal(resultForUser)
 	w.Write(marshaled)
 	log.Println(string(marshaled))
+}
+
+func isResultValid(res result) bool {
+	return res.Iterative != "" && res.IterativeFibV2 != "" && res.Recursive != "" && res.Slices != ""
+}
+
+func handleInvalidRequest(w http.ResponseWriter, url string) {
+	w.WriteHeader((http.StatusBadRequest))
+	io.WriteString(w, "Error: Must be a positive integer!")
+	log.Printf("Invalid request URL: %s!", url)
 }
