@@ -1,6 +1,6 @@
-package main
+package fib
 
-func iterativeFibV2(n int) int {
+func IterativeFibV2(n int) int {
 	x := 0
 	y := 1
 	for i := 0; i < n; i++ {

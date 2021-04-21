@@ -1,6 +1,6 @@
-package main
+package fib
 
-func iterativeFib(n int) (fib int) {
+func IterativeFib(n int) (fib int) {
 	x := 0
 	y := 1
 	z := 1
