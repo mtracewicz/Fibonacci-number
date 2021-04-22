@@ -12,6 +12,16 @@ func TestIterative(t *testing.T) {
 	}
 }
 
+func TestIterativeOtherModulo(t *testing.T) {
+	got, err := IterativeFib(18)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	if got != 2584 {
+		t.Errorf("Fib(18) = %d; want 2584", got)
+	}
+}
+
 func TestIterativeLesserThen2(t *testing.T) {
 	got, err := IterativeFib(1)
 	if err != nil {
