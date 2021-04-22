@@ -1,4 +1,4 @@
-FROM golang:1.13.15-alpine as build
+FROM golang:1.16.3-alpine3.13 as build
 WORKDIR /src
 COPY . .
 RUN ["go", "build", "-o", "main", "."]
